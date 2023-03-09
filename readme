@@ -1,0 +1,50 @@
+//Author:       Bemnet Mekrebu
+//Project:      Lexical anlayzer for a C compiler
+//Date: 
+//Supervisor:   Dr. Tejasvi Parupudi
+
+
+Summary 
+This a project for the Principles of Systems Programing (CSCE 3600) class of spring 2023. The project is making a Lexical Analyzer for the programing language C. Using the basic lessons that we are going to cover in class and some additional sources based on the web, the program that is going to be written will analyze a series of inputs (letters and phrases) and output a set of tokens. 
+
+Project Background
+A lexical analyzer is a part of a compiler that scans a source code character by character and groups the characters in a predefined set. The output of this program then provides these tokens to the syntax analyzer.
+
+Project Objective
+The main objective of this project is to build a program that converts these abstract streams of characters (from source code) into meaningful sets of tokens feeding the next stage of the compiler.
+
+Technology in Use
+-	C programing language
+-	C libraries, Third-party libraries
+
+
+
+//Notes & thought process
+
+//main lexer function
+    /* break down the input source code
+    - might need a symnol table to track identifiers and data types
+    - implement a fintie state machine 
+        - determine appropriate token to asssign to each substring of the input string
+        - current char, prev state, next state
+        - if curr state - accept -> add token on array
+
+
+//Build input buffer
+/*Building an input lexer is important in storing series of input temprorarily from a file or text
+- avoid to repeatedly acess the file
+- pre-process input such as removing comments
+- out put debugging info from the buffer (informative errrors)
+*/
+
+//Build tokenizer
+/*already started this phase
+- have to integrate it with the input buffer */
+- tokenize function (takes a char pointer to the input string)
+    -retruns array of tokens*/
+
+//Build White space and comment handler
+
+//Build error handler
+
+//Build output generator 
