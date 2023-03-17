@@ -48,3 +48,20 @@ Technology in Use
 //Build error handler
 
 //Build output generator 
+
+
+
+//Input file 
+- Columns restarts from 0 everyline
+- Pos never resets through out the document
+- Any character in a file, even white spaces are processed 
+
+                            Columns
+Line no : 1   |   a       +       2       >       amount
+              |  [0] [1] [2] [3] [4] [5] [6] [7] [8 - 13]    
+              |                                    |
+              |                                    |
+                                            ---------------       
+                                            |             |
+                                          a   m    o    u    n    t
+                                    Pos  [8] [9] [10]  [11] [12] [13]

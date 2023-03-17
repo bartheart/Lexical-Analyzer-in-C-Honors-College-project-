@@ -18,13 +18,10 @@ char input_buffer[MAX_INPUT_SIZE];
 //Define tokens 
 enum TokenType{
     IDENTIFIER =1,
-    INTEGER_LITERAL,
+    KEYWORD,
+    CONSTANT,
     STRING_LITERAL,
-    ADD, SUB, NEGATE, DIV, MOD, MUL, EQUAL,
-    IF, ELSE, WHILE, FOR,
-    SEMICOLON, COMMA, LEFT_PARENTHESIS, RIGHT_PARENTHESIS,
-    LEFT_BRACE, RIGHT_BRACE, SPACE
-    
+    PUNCTUATOR
 };
 
 //Define structure of a token
@@ -49,6 +46,8 @@ void error(int line, int col, const char *msg, ...){
     exit(1);
 
 }
+
+//comment handling
 
 //index postion 
 static int pos = 0, line = 0, col = 0;
@@ -96,15 +95,19 @@ struct Token lex(){
         identifier[len] = '\0';
 
         //check for keyword
-        if (strcmp(identifier, "if") == 0){
-            token.type = IF;
-        } else if (strcmp(identifier, "else") == 0){
-            token.type = ELSE;
-        } else if (strcmp(identifier, "while") == 0){
-            token.type = WHILE;
-        } else if (strcmp(identifier, "for") == 0){
-            token.type = FOR;
-        } else {
+        char *arr[] = {"auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else", "enum", "extern", "float", "for", "goto", "if", "inline", "int", "long", "register", "restrict", "return", "short", "signed", "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while", "_Alignas", "_Alignof", "_Atomic _Bool", "_Complex", "_Generic", "_Imaginary", "_Noreturn", "_Static_assert", "_Thread_local"};
+        //extract number of keywords
+        int num_keywords = sizeof(arr) / sizeof(char*);
+
+        for (int i = 0; i<num_keywords; i++){
+            if (strcmp(identifier, arr[i]) == 0){
+                token.type = KEYWORD;
+                token.text = strdup(identifier);
+                break;
+            }
+        }
+        //fall back if its not a keyword
+        if (token.type != KEYWORD){
             //identifier
             token.type = IDENTIFIER;
             token.text = strdup(identifier);
@@ -119,7 +122,8 @@ struct Token lex(){
             value = value * 10 + curr_char - '0';
             next_character();
         }
-        token.type = INTEGER_LITERAL;
+        token.type = CONSTANT;
+        token.text = "INTEGER_CONSTANT";
         token.n = value;
         return token;
     }
@@ -148,17 +152,17 @@ struct Token lex(){
 
     //check for operators and punctuation
     switch (curr_char){
-        case '+': token.type = ADD; next_character(); break;
-        case '-': token.type = SUB; next_character(); break;
-        case '*': token.type = MUL; next_character(); break;
-        case '/': token.type = DIV; next_character(); break;
-        case '%': token.type = MOD; next_character(); break;
-        case ';': token.type = SEMICOLON; next_character(); break;
-        case ',': token.type = COMMA; next_character(); break;
-        case '(': token.type = LEFT_PARENTHESIS; next_character(); break;
-        case ')': token.type = RIGHT_PARENTHESIS; next_character(); break;
-        case '{': token.type = LEFT_BRACE; next_character(); break;
-        case '}': token.type = RIGHT_BRACE; next_character(); break;
+        case '+': token.type = PUNCTUATOR; token.text = "ADD"; next_character(); break;
+        case '-': token.type = PUNCTUATOR; token.text = "SUB"; next_character(); break;
+        case '*': token.type = PUNCTUATOR; token.text = "MUL"; next_character(); break;
+        case '/': token.type = PUNCTUATOR; token.text = "DIV"; next_character(); break;
+        case '%': token.type = PUNCTUATOR; token.text = "MOD"; next_character(); break;
+        case ';': token.type = PUNCTUATOR; token.text = "SEMICOLON"; next_character(); break;
+        case ',': token.type = PUNCTUATOR; token.text = "COMMA"; next_character(); break;
+        case '(': token.type = PUNCTUATOR; token.text = "LEFT_PARENTHESIS"; next_character(); break;
+        case ')': token.type = PUNCTUATOR; token.text = "RIGHT_PARENTHESIS"; next_character(); break;
+        case '{': token.type = PUNCTUATOR; token.text = "LEFT_BRACE"; next_character(); break;
+        case '}': token.type = PUNCTUATOR; token.text = "RIGHT_BRACE"; next_character(); break;
         default: error(line, col, "Invalid character '%c'", curr_char);
     }
 
@@ -167,6 +171,7 @@ struct Token lex(){
 
 
 int main(){
+    
     printf("Enter a simple expression: ");
 
     fgets(input_buffer, sizeof(input_buffer), stdin);
@@ -179,28 +184,22 @@ int main(){
                 printf("IDENTIFIER: %s\n", token.text);
                 free(token.text);
                 break;
-            case INTEGER_LITERAL:
-                printf("INTEGER_LITERAL: %d\n", token.n);
+            case KEYWORD:
+                printf("KEYWORD: %s\n", token.text);
+                //free(token.text);
+                break;
+            case CONSTANT:
+                printf("CONSTANT: %d\n", token.n);
+                //free(token.text);
                 break;
             case STRING_LITERAL:
                 printf("STRING_LITERAL: %s\n", token.text);
                 free(token.text);
                 break;
-            case ADD: printf("ADD\n"); break;
-            case SUB: printf("SUB\n"); break;
-            case MUL: printf("MUL\n"); break;
-            case DIV: printf("DIV\n"); break;
-            case MOD: printf("MOD\n"); break;
-            case IF: printf("IF\n"); break;
-            case ELSE: printf("ELSE\n"); break;
-            case WHILE: printf("WHILE\n"); break;
-            case FOR: printf("FOR\n"); break;
-            case SEMICOLON: printf("SEMICOLON\n"); break;
-            case COMMA: printf("COMMA\n"); break;
-            case LEFT_PARENTHESIS: printf("LEFT_PARENTHESIS\n"); break;
-            case RIGHT_PARENTHESIS: printf("RIGHT_PARENTHESIS\n"); break;
-            case LEFT_BRACE: printf("LEFT_BRACE\n"); break;
-            case RIGHT_BRACE: printf("RIGHT_BRACE\n"); break;
+            case PUNCTUATOR:
+                printf("PUNCTUATOR: %s\n", token.text);
+                //free(token.text);
+                break;
             default: error(token.errorLine, token.errorColumn, "Invalid token");
         }
     }
