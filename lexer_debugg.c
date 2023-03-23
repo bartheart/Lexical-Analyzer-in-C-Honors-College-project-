@@ -50,13 +50,13 @@ void error(int line, int col, const char *msg, ...){
 
 
 //index postion 
-static int pos = 0, line = 0, col = 0;
+static int pos = 0, line = 1, col = 0;
 static char curr_char = ' ';
 
 
 static int next_character (){
     if(pos >= strlen(input_buffer)){
-        printf("Reached end of file\n");
+        printf("-----------Reached end of file----------\n");
         exit(0);
     }
     curr_char = input_buffer[pos++];
@@ -222,6 +222,8 @@ struct Token lex(){
         case ')': token.type = PUNCTUATOR; token.text = "RIGHT_PARENTHESIS"; next_character(); break;
         case '{': token.type = PUNCTUATOR; token.text = "LEFT_BRACE"; next_character(); break;
         case '}': token.type = PUNCTUATOR; token.text = "RIGHT_BRACE"; next_character(); break;
+        case '[': token.type = PUNCTUATOR; token.text = "LEFT_SQUARE_BRACKET"; next_character(); break;
+        case ']': token.type = PUNCTUATOR; token.text = "RIGHT_SQUARE_BRACKET"; next_character(); break;
         case '.': token.type = PUNCTUATOR; token.text = "DOT"; next_character(); break;
         case '#': token.type = PUNCTUATOR; token.text = "PREPROCESSOR"; next_character(); break;
         case '_': token.type = PUNCTUATOR; token.text = "UNDERSCORE"; next_character(); break;
@@ -264,25 +266,70 @@ struct Token lex(){
     return token;
 }
 
+int menu(){
+    int choice;
+    printf("----------------------------------------\n");
+    printf("Which options do you want?           \n 1 - Analyze from an input expression\n 2 - Read from a file\n 3 - Read from a default file\n");
+    printf("----------------------------------------\n");
+    scanf("%d", &choice);
+
+    
+    return choice;
+}
 
 int main(){
-    // Open input file
-    FILE *input_file = fopen("major1.c", "r");
-    if (input_file == NULL) {
-        fprintf(stderr, "Error opening file");
-        return 1;
+    char filename[100];
+    int count;
+
+    printf("          Lexical Analyzer Progam\n");
+    //menu options call
+    int option = 0;
+    //fgets(input_buffer, sizeof(input_buffer), stdin);
+    FILE *input_file = NULL;
+    option = menu();
+    switch (option){
+        case 1:
+            printf("Input an expression: ");
+            fgets(input_buffer, MAX_INPUT_SIZE, stdin);
+            break;
+        case 2:
+            printf("Input the name of your file: ");
+            scanf("%s", filename);
+            // Open input file
+            input_file = fopen(filename, "r");
+            if (input_file == NULL) {
+                fprintf(stderr, "Error opening file");
+                return 1;
+            }
+            else{
+                printf("Intiating lexical analysis ...\n");
+                printf("Position      TokenType   Description\n");
+            }
+            // read contents of file into input buffer
+            count = fread(input_buffer, sizeof(char), MAX_INPUT_SIZE, input_file);
+            break;
+        case 3:
+            // Open input file
+            input_file = fopen("test1.c", "r");
+            if (input_file == NULL) {
+                fprintf(stderr, "Error opening file");
+                return 1;
+            }
+            else{
+                printf("Intiating lexical analysis ...\n");
+                printf("Position      TokenType   Description\n");
+            }
+            // read contents of file into input buffer
+            count = fread(input_buffer, sizeof(char), MAX_INPUT_SIZE, input_file);
+            break;
     }
-    else{
-        printf("Intiating lexical analysis ...\n");
-    }
-    
-    // read contents of file into input buffer
-    int count = fread(input_buffer, sizeof(char), MAX_INPUT_SIZE, input_file);
-    
+
+
+
     //lexer call
     struct Token token;
-    printf("Line   Column    TokenType   Description\n");
     while ((token = lex()).type != EOF){
+        sleep(1);
         printf("[%2d, %2d ]", line, col); // use a field width of 4 for alignment
         switch (token.type){
             case IDENTIFIER:

@@ -7,9 +7,10 @@
 #include <string.h>
 #include <ctype.h> //standard C library
 #include <stdarg.h>
+#include <unistd.h>
 
 
-#define MAX_INPUT_SIZE 100 
+#define MAX_INPUT_SIZE 100000 
 
 //input buffer
 char input_buffer[MAX_INPUT_SIZE];
@@ -47,14 +48,16 @@ void error(int line, int col, const char *msg, ...){
 
 }
 
-//comment handling
 
 //index postion 
 static int pos = 0, line = 0, col = 0;
 static char curr_char = ' ';
+
+
 static int next_character (){
     if(pos >= strlen(input_buffer)){
-        return EOF;
+        printf("-----------Reached end of file----------\n");
+        exit(0);
     }
     curr_char = input_buffer[pos++];
     ++col;
@@ -66,6 +69,7 @@ static int next_character (){
 
     return curr_char; 
 }
+
 
 //lex function
 struct Token lex(){
@@ -150,57 +154,152 @@ struct Token lex(){
         return token;
     }
 
+    //Handling comments and division operator
+    if (curr_char == '/') {
+        next_character();
+        if (curr_char == '/') {
+            // single-line comment, skip until end of line
+            while (curr_char != '\n' && curr_char != EOF) {
+                next_character();
+            }
+            // call lex again to get the next token after the comment
+            return lex();
+        }
+        else if (curr_char == '*') {
+            // block comment, skip until "*/" is found
+            int comment_start_line = line;
+            int comment_start_col = col - 1;
+            next_character(); // consume the "*"
+            while (curr_char != EOF) {
+                if (curr_char == '*' && next_character() == '/') {
+                    next_character(); // consume the "/"
+                    // call lex again to get the next token after the comment
+                    return lex();
+                }
+                else {
+                    next_character();
+                }
+            }
+            // reached end of input before end of comment
+            error(comment_start_line, comment_start_col, "Unterminated block comment");
+        }
+        else {
+            // division operator
+            token.type = PUNCTUATOR;
+            token.text = "DIV";
+            return token;
+        }
+    }
+
+    //handling assign and equality operations
+    if (curr_char == '='){
+        next_character();
+        if (curr_char == '='){
+            //equality operation, punctuator
+            token.type = PUNCTUATOR;
+            token.text = "EQUAL";
+            return token;
+        }
+        else{
+            //assign tool
+            token.type = PUNCTUATOR;
+            token.text = "ASSIGN";
+            return token;
+        }
+    }
+
     //check for operators and punctuation
     switch (curr_char){
         case '+': token.type = PUNCTUATOR; token.text = "ADD"; next_character(); break;
         case '-': token.type = PUNCTUATOR; token.text = "SUB"; next_character(); break;
         case '*': token.type = PUNCTUATOR; token.text = "MUL"; next_character(); break;
-        case '/': token.type = PUNCTUATOR; token.text = "DIV"; next_character(); break;
         case '%': token.type = PUNCTUATOR; token.text = "MOD"; next_character(); break;
+        case '<': token.type = PUNCTUATOR; token.text = "LESS_THAN"; next_character(); break;
+        case '>': token.type = PUNCTUATOR; token.text = "GREATER_THAN"; next_character(); break;
         case ';': token.type = PUNCTUATOR; token.text = "SEMICOLON"; next_character(); break;
         case ',': token.type = PUNCTUATOR; token.text = "COMMA"; next_character(); break;
         case '(': token.type = PUNCTUATOR; token.text = "LEFT_PARENTHESIS"; next_character(); break;
         case ')': token.type = PUNCTUATOR; token.text = "RIGHT_PARENTHESIS"; next_character(); break;
         case '{': token.type = PUNCTUATOR; token.text = "LEFT_BRACE"; next_character(); break;
         case '}': token.type = PUNCTUATOR; token.text = "RIGHT_BRACE"; next_character(); break;
+        case '[': token.type = PUNCTUATOR; token.text = "LEFT_SQUARE_BRACKET"; next_character(); break;
+        case ']': token.type = PUNCTUATOR; token.text = "RIGHT_SQUARE_BRACKET"; next_character(); break;
+        case '.': token.type = PUNCTUATOR; token.text = "DOT"; next_character(); break;
+        case '#': token.type = PUNCTUATOR; token.text = "PREPROCESSOR"; next_character(); break;
+        case '_': token.type = PUNCTUATOR; token.text = "UNDERSCORE"; next_character(); break;
+        case '|': token.type = PUNCTUATOR; next_character();
+        //handling OR operation
+        if (curr_char == '|'){
+            //Not equal operation
+            token.text = "OR";
+        }
+        else{
+            error(line, col, "Invalid character '%c'", curr_char);
+        }
+        break;
+        case '&': token.type = PUNCTUATOR; next_character();
+        //handling AND and & adrress operations
+        if (curr_char == '&'){
+            //Not equal operation
+            token.text = "AND";
+        }
+        else{
+            //assign tool
+            token.text = "ADDRESS-OF";
+        }
+        break;
+        //handling not equal and negate
+        case '!': token.type = PUNCTUATOR; next_character(); 
+        if (curr_char == '='){
+            //Not equal operation
+            token.text = "NOT_EQUAL";
+        }
+        else{
+            //assign tool
+            token.text = "NEGATE";
+        }
+        break;
+        case '=': token.type = PUNCTUATOR; token.text = "ASSIGN"; next_character(); break;
         default: error(line, col, "Invalid character '%c'", curr_char);
     }
 
     return token;
 }
 
-
 int main(){
-    
+    printf("          Lexical Analyzer Progam\n");
+    printf("----------------------------------------\n");
     printf("Enter a simple expression: ");
 
     fgets(input_buffer, sizeof(input_buffer), stdin);
 
     //lexer call
     struct Token token;
+    printf("Intiating lexical analysis ...\n");
+    printf("Position    TokenType   Description\n");
     while ((token = lex()).type != EOF){
+        sleep(1);
+        printf("[%2d, %2d ]", line, col); // use a field width of 4 for alignment
         switch (token.type){
             case IDENTIFIER:
-                printf("IDENTIFIER: %s\n", token.text);
+                printf("     IDENTIFIER     %s\n", token.text);
                 free(token.text);
                 break;
             case KEYWORD:
-                printf("KEYWORD: %s\n", token.text);
-                //free(token.text);
-                break;
+                printf("      KEYWORD       %s\n", token.text);
+                break;  
             case CONSTANT:
-                printf("CONSTANT: %d\n", token.n);
-                //free(token.text);
+                printf("      CONSTANT      %d\n", token.n);
                 break;
             case STRING_LITERAL:
-                printf("STRING_LITERAL: %s\n", token.text);
+                printf("    STRING_LIT      %s\n", token.text);
                 free(token.text);
                 break;
             case PUNCTUATOR:
-                printf("PUNCTUATOR: %s\n", token.text);
-                //free(token.text);
+                printf("    PUNCTUATOR      %s\n", token.text);
                 break;
-            default: error(token.errorLine, token.errorColumn, "Invalid token");
+            default: 
+                error(token.errorLine, token.errorColumn, "Invalid token");
         }
     }
 
