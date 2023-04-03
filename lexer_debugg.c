@@ -143,8 +143,26 @@ struct Token lex(){
             if (curr_char == '\\'){
                 next_character();
             }
-            text[len++] = curr_char;
-            next_character();
+            else if (curr_char == '%'){
+                next_character();
+                //detect the conversion specifiers 
+                if (curr_char == 'd' || curr_char == 'f' || curr_char == 's'){
+                    text[len++] = '%';
+                    text[len++] = curr_char;
+                    token.text = "CONVERSION_SPECIFIER";
+                }
+                else {
+                    //not a conversion specifier
+                    text[len++] = '%';
+                    text[len++] = curr_char;
+                }
+                next_character();
+            }
+            else{
+                text[len++] = curr_char;
+                next_character();
+            }
+            
         }
         text[len] = '\0';
 
@@ -214,8 +232,23 @@ struct Token lex(){
         case '-': token.type = PUNCTUATOR; token.text = "SUB"; next_character(); break;
         case '*': token.type = PUNCTUATOR; token.text = "MUL"; next_character(); break;
         case '%': token.type = PUNCTUATOR; token.text = "MOD"; next_character(); break;
-        case '<': token.type = PUNCTUATOR; token.text = "LESS_THAN"; next_character(); break;
-        case '>': token.type = PUNCTUATOR; token.text = "GREATER_THAN"; next_character(); break;
+        case '<': token.type = PUNCTUATOR; next_character();
+        if (curr_char == '='){
+            token.text = "LESS_THAN_OR_EQUAL"; 
+        } 
+        else{
+            token.text = "LESS_THAN"; 
+        }
+        break;
+        case '>': token.type = PUNCTUATOR; next_character(); 
+        if (curr_char == '=')
+        {
+            token.text = "GREATER_THAN_OR_EQUAL"; 
+        }
+        else{
+            token.text = "GREATER_THAN"; 
+        }
+        break;
         case ';': token.type = PUNCTUATOR; token.text = "SEMICOLON"; next_character(); break;
         case ',': token.type = PUNCTUATOR; token.text = "COMMA"; next_character(); break;
         case '(': token.type = PUNCTUATOR; token.text = "LEFT_PARENTHESIS"; next_character(); break;
@@ -225,7 +258,10 @@ struct Token lex(){
         case '[': token.type = PUNCTUATOR; token.text = "LEFT_SQUARE_BRACKET"; next_character(); break;
         case ']': token.type = PUNCTUATOR; token.text = "RIGHT_SQUARE_BRACKET"; next_character(); break;
         case '.': token.type = PUNCTUATOR; token.text = "DOT"; next_character(); break;
-        case '#': token.type = PUNCTUATOR; token.text = "PREPROCESSOR"; next_character(); break;
+        case '#': token.type = PUNCTUATOR; token.text = "PREPROCESSOR"; next_character(); 
+        //pre processor filename exclusion
+
+        break;
         case '_': token.type = PUNCTUATOR; token.text = "UNDERSCORE"; next_character(); break;
         case '|': token.type = PUNCTUATOR; next_character();
         //handling OR operation
@@ -243,7 +279,8 @@ struct Token lex(){
             //Not equal operation
             token.text = "AND";
         }
-        else{
+        else if(!(isspace(curr_char))){
+            if(lex().type == IDENTIFIER){}
             //assign tool
             token.text = "ADDRESS-OF";
         }
@@ -310,14 +347,14 @@ int main(){
             break;
         case 3:
             // Open input file
-            input_file = fopen("test1.c", "r");
+            input_file = fopen("test3.c", "r");
             if (input_file == NULL) {
                 fprintf(stderr, "Error opening file");
                 return 1;
             }
             else{
                 printf("Intiating lexical analysis ...\n");
-                printf("Position      TokenType   Description\n");
+                printf("Position      TokenType     Description\n");
             }
             // read contents of file into input buffer
             count = fread(input_buffer, sizeof(char), MAX_INPUT_SIZE, input_file);

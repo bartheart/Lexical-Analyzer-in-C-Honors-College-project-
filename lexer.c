@@ -214,8 +214,23 @@ struct Token lex(){
         case '-': token.type = PUNCTUATOR; token.text = "SUB"; next_character(); break;
         case '*': token.type = PUNCTUATOR; token.text = "MUL"; next_character(); break;
         case '%': token.type = PUNCTUATOR; token.text = "MOD"; next_character(); break;
-        case '<': token.type = PUNCTUATOR; token.text = "LESS_THAN"; next_character(); break;
-        case '>': token.type = PUNCTUATOR; token.text = "GREATER_THAN"; next_character(); break;
+        case '<': token.type = PUNCTUATOR; next_character();
+        if (curr_char == '='){
+            token.text = "LESS_THAN_OR_EQUAL"; 
+        } 
+        else{
+            token.text = "LESS_THAN"; 
+        }
+        break;
+        case '>': token.type = PUNCTUATOR; next_character(); 
+        if (curr_char == '=')
+        {
+            token.text = "GREATER_THAN_OR_EQUAL"; 
+        }
+        else{
+            token.text = "GREATER_THAN"; 
+        }
+        break;
         case ';': token.type = PUNCTUATOR; token.text = "SEMICOLON"; next_character(); break;
         case ',': token.type = PUNCTUATOR; token.text = "COMMA"; next_character(); break;
         case '(': token.type = PUNCTUATOR; token.text = "LEFT_PARENTHESIS"; next_character(); break;
