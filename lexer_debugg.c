@@ -5,15 +5,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h> //standard C library
+#include <ctype.h> 
 #include <stdarg.h>
 #include <unistd.h>
 
 
 #define MAX_INPUT_SIZE 100000 
 
+//token type count 
+int tokenCount[] = {0, 0, 0, 0, 0}; 
+
 //input buffer
-char input_buffer[MAX_INPUT_SIZE];
+char input_buffer[MAX_INPUT_SIZE];  
 
 
 //Define tokens 
@@ -48,15 +51,26 @@ void error(int line, int col, const char *msg, ...){
 
 }
 
-
 //index postion 
 static int pos = 0, line = 1, col = 0;
 static char curr_char = ' ';
 
+//final count of token types
+int analysis(int arr[]){
+    char *toks[] = {"IDENTIFIER", "KEYWORD", "CONSTANT", "STRING_LITERAL", "PUNCTUATOR"}; 
+    printf("\n      * Final Analysis *\n");
+    printf("   Type        Count\n---------------------\n");
+    for (int i = 0; i < 5; i++){
+        printf("%-16s %-16d\n", toks[i], arr[i]);
+    }
+    return 0;
+}
 
+//detect next chracter 
 static int next_character (){
     if(pos >= strlen(input_buffer)){
         printf("-----------Reached end of file----------\n");
+        analysis(tokenCount);
         exit(0);
     }
     curr_char = input_buffer[pos++];
@@ -154,7 +168,7 @@ struct Token lex(){
                 else {
                     //not a conversion specifier
                     text[len++] = '%';
-                    text[len++] = curr_char;
+                    text[len] = curr_char;
                 }
                 next_character();
             }
@@ -228,8 +242,16 @@ struct Token lex(){
 
     //check for operators and punctuation
     switch (curr_char){
-        case '+': token.type = PUNCTUATOR; token.text = "ADD"; next_character(); break;
-        case '-': token.type = PUNCTUATOR; token.text = "SUB"; next_character(); break;
+        case '+': token.type = PUNCTUATOR; token.text = "ADD"; next_character(); 
+        if (curr_char == '+'){
+            token.text = "INCREMENT"; 
+        } 
+        break;
+        case '-': token.type = PUNCTUATOR; token.text = "SUB"; next_character(); 
+        if (curr_char == '-'){
+            token.text = "DECREMENT"; 
+        } 
+        break;
         case '*': token.type = PUNCTUATOR; token.text = "MUL"; next_character(); break;
         case '%': token.type = PUNCTUATOR; token.text = "MOD"; next_character(); break;
         case '<': token.type = PUNCTUATOR; next_character();
@@ -258,10 +280,7 @@ struct Token lex(){
         case '[': token.type = PUNCTUATOR; token.text = "LEFT_SQUARE_BRACKET"; next_character(); break;
         case ']': token.type = PUNCTUATOR; token.text = "RIGHT_SQUARE_BRACKET"; next_character(); break;
         case '.': token.type = PUNCTUATOR; token.text = "DOT"; next_character(); break;
-        case '#': token.type = PUNCTUATOR; token.text = "PREPROCESSOR"; next_character(); 
-        //pre processor filename exclusion
-
-        break;
+        case '#': token.type = PUNCTUATOR; token.text = "PREPROCESSOR"; next_character(); break;
         case '_': token.type = PUNCTUATOR; token.text = "UNDERSCORE"; next_character(); break;
         case '|': token.type = PUNCTUATOR; next_character();
         //handling OR operation
@@ -303,6 +322,7 @@ struct Token lex(){
     return token;
 }
 
+//menu options
 int menu(){
     int choice;
     printf("----------------------------------------\n");
@@ -314,6 +334,7 @@ int menu(){
     return choice;
 }
 
+//main function 
 int main(){
     char filename[100];
     int count;
@@ -340,7 +361,7 @@ int main(){
             }
             else{
                 printf("Intiating lexical analysis ...\n");
-                printf("Position      TokenType   Description\n");
+                printf("Position      TokenType      Description\n------------------------------------------\n");
             }
             // read contents of file into input buffer
             count = fread(input_buffer, sizeof(char), MAX_INPUT_SIZE, input_file);
@@ -354,13 +375,12 @@ int main(){
             }
             else{
                 printf("Intiating lexical analysis ...\n");
-                printf("Position      TokenType     Description\n");
+                printf("Position      TokenType     Description\n------------------------------------------\n");
             }
             // read contents of file into input buffer
             count = fread(input_buffer, sizeof(char), MAX_INPUT_SIZE, input_file);
             break;
     }
-
 
 
     //lexer call
@@ -371,20 +391,25 @@ int main(){
         switch (token.type){
             case IDENTIFIER:
                 printf("     IDENTIFIER     %s\n", token.text);
+                tokenCount[0]++; 
                 free(token.text);
                 break;
             case KEYWORD:
                 printf("      KEYWORD       %s\n", token.text);
+                tokenCount[1]++; 
                 break;  
             case CONSTANT:
                 printf("      CONSTANT      %d\n", token.n);
+                tokenCount[2]++; 
                 break;
             case STRING_LITERAL:
                 printf("    STRING_LIT      %s\n", token.text);
+                tokenCount[3]++; 
                 free(token.text);
                 break;
             case PUNCTUATOR:
                 printf("    PUNCTUATOR      %s\n", token.text);
+                tokenCount[4]++; 
                 break;
             default: 
                 error(token.errorLine, token.errorColumn, "Invalid token");
@@ -393,3 +418,4 @@ int main(){
 
     return 0;
 }
+
