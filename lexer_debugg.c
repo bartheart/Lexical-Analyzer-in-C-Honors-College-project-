@@ -347,8 +347,11 @@ int main(){
     option = menu();
     switch (option){
         case 1:
-            printf("Input an expression: ");
+            fflush(stdin);
+            printf("Input statment for analysis: ");
             fgets(input_buffer, MAX_INPUT_SIZE, stdin);
+            printf("Intiating lexical analysis ...\n");
+            printf("Position      TokenType      Description\n------------------------------------------\n");
             break;
         case 2:
             printf("Input the name of your file: ");
