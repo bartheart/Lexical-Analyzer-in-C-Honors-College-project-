@@ -1,3 +1,5 @@
+<img src="assets/logo.png" width="200" height="auto" alt="unt honors logo">
+
 # C Compiler Lexical Analyzer 🚀
 
 ## 📝 Table of Contents
@@ -18,7 +20,7 @@
 
 A robust lexical analyzer for C programming language, designed to convert raw source code into meaningful tokens for compiler processing.
 
-![Lexical Analyzer Workflow](https://via.placeholder.com/800x400.png?text=Lexical+Analyzer+Workflow)
+<img src="assets/Picture1.png" width="400" height="auto" alt="lexer workflow">
 
 ## 🔍 Project Background
 
@@ -27,7 +29,7 @@ A lexical analyzer (lexer) is a crucial component of a compiler that performs th
 - Groups characters into predefined token sets
 - Prepares tokens for syntax analysis in subsequent compiler stages
 
-![Lexer Process Diagram](https://via.placeholder.com/800x300.png?text=Lexer+Process+Diagram)
+<img src="assets/Picture2.png" width="200" height="auto" alt="lexer process">
 
 ## 🎯 Project Objectives
 
@@ -75,6 +77,9 @@ The primary goals of this lexical analyzer include:
 - GCC Compiler (version 7.0+)
 - GNU Make
 - Linux/Unix environment (recommended)
+  
+## Getting Started
+
 ### Installation
 
 1. Clone the repository
@@ -100,6 +105,9 @@ make
 ```
 
 # 🏗️ System Architecture
+
+<img src="assets/Picture3.png" width="500" height="auto" alt="lexer workflow">
+
 ## Lexer Components
 
 ### Input Buffer
@@ -123,6 +131,26 @@ make
 - Operators
 - Literals
 - Special Symbols
+
+# Demo Results 
+
+## Basic Arithmetic Operations
+<img src="assets/Picture4.png" width="300" height="auto" alt="lexer workflow">
+<img src="assets/Picture5.png" width="300" height="auto" alt="lexer workflow">
+
+## Complex Operations 
+<img src="assets/Picture7.png" width="300" height="auto" alt="lexer workflow">
+<img src="assets/Picture8.png" width="300" height="auto" alt="lexer workflow">
+
+## Entire Source Code
+<img src="assets/Picture6.png" width="300" height="auto" alt="lexer workflow">
+
+
+# Video Demo 
+
+[Demo Video] https://www.youtube.com/watch?v=vd4PzbtRP8U
+
+
 
 # 🤝 Contributing
 
