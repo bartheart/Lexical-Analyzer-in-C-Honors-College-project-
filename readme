@@ -1,67 +1,97 @@
-//Author:       Bemnet Mekrebu
-//Project:      Lexical anlayzer for a C compiler
-//Date: 
-//Supervisor:   Dr. Tejasvi Parupudi
+# Lexical Analyzer for a C Compiler  
 
+Author: **Bemnet Mekrebu**  
+Supervisor: **Dr. Tejasvi Parupudi**  
+Date: **Spring 2023**  
 
-Summary 
-This a project for the Principles of Systems Programing (CSCE 3600) class of spring 2023. The project is making a Lexical Analyzer for the programing language C. Using the basic lessons that we are going to cover in class and some additional sources based on the web, the program that is going to be written will analyze a series of inputs (letters and phrases) and output a set of tokens. 
+---
 
-Project Background
-A lexical analyzer is a part of a compiler that scans a source code character by character and groups the characters in a predefined set. The output of this program then provides these tokens to the syntax analyzer.
+## **Project Overview**  
+This project, developed for the **Principles of Systems Programming (CSCE 3600)** class, implements a **Lexical Analyzer** for the C programming language. The analyzer scans a source code file, processes its content, and outputs a series of meaningful **tokens** for use in the next stage of compilation (syntax analysis).  
 
-Project Objective
-The main objective of this project is to build a program that converts these abstract streams of characters (from source code) into meaningful sets of tokens feeding the next stage of the compiler.
+---
 
-Technology in Use
--	C programing language
--	C libraries, Third-party libraries
+## **Table of Contents**  
+1. [Project Background](#project-background)  
+2. [Objectives](#objectives)  
+3. [Features](#features)  
+4. [Technologies Used](#technologies-used)  
+5. [How It Works](#how-it-works)  
+6. [File Structure](#file-structure)  
+7. [Usage](#usage)  
+8. [Acknowledgments](#acknowledgments)  
 
+---
 
+## **Project Background**  
+A **Lexical Analyzer** is the first stage of a compiler. It scans the source code character by character, grouping them into **tokens** based on predefined rules. These tokens serve as the building blocks for the syntax analyzer, which interprets the structure of the code.
 
-//Notes & thought process
+**Key Features of a Lexical Analyzer:**  
+- Identifies keywords, identifiers, operators, literals, and symbols.  
+- Handles comments and white spaces.  
+- Prepares data for the syntax analysis phase.  
 
-//main lexer function
-    /* break down the input source code
-    - might need a symnol table to track identifiers and data types
-    - implement a fintie state machine 
-        - determine appropriate token to asssign to each substring of the input string
-        - current char, prev state, next state
-        - if curr state - accept -> add token on array
+---
 
+## **Objectives**  
+The primary objectives of this project are:  
+- To **parse and tokenize C source code** into identifiable components.  
+- To **handle complex constructs** such as multi-line comments and escape characters.  
+- To provide **clear debugging outputs** and token counts.  
 
-//Build input buffer
-/*Building an input lexer is important in storing series of input temprorarily from a file or text
-- avoid to repeatedly acess the file
-- pre-process input such as removing comments
-- out put debugging info from the buffer (informative errrors)
-*/
+---
 
-//Build tokenizer
-/*already started this phase
-- have to integrate it with the input buffer */
-- tokenize function (takes a char pointer to the input string)
-    -retruns array of tokens*/
+## **Features**  
+- **Tokenization:** Breaks the source code into meaningful tokens (keywords, literals, symbols, etc.).  
+- **Input Buffering:** Pre-processes input to remove comments and handle white spaces effectively.  
+- **Error Handling:** Outputs informative error messages for debugging.  
+- **Comment Handling:** Supports inline (`//`) and block (`/* */`) comments.  
+- **Finite State Machine:** Tracks the state transitions of characters for efficient parsing.  
+- **Debugging Mode:** Outputs detailed logs for analysis.  
 
-//Build White space and comment handler
+---
 
-//Build error handler
+## **Technologies Used**  
+- **Programming Language:** C  
+- **Libraries:** Standard C Libraries, Third-party libraries (for input handling and debugging).  
 
-//Build output generator 
+---
 
+## **How It Works**  
 
+### Input Buffer  
+Stores the input temporarily to optimize file access and pre-process the content.  
+- Removes comments.  
+- Outputs debugging information.  
+- Tracks line, column, and character positions.  
 
-//Input file 
-- Columns restarts from 0 everyline
-- Pos never resets through out the document
-- Any character in a file, even white spaces are processed 
+### Tokenizer  
+Processes the input buffer and generates tokens:  
+1. Reads input using `next_character()`.  
+2. Groups characters based on predefined token rules using a **finite state machine**.  
+3. Outputs an array of tokens.  
 
-                            Columns
-Line no : 1   |   a       +       2       >       amount
-              |  [0] [1] [2] [3] [4] [5] [6] [7] [8 - 13]    
-              |                                    |
-              |                                    |
-                                            ---------------       
-                                            |             |
-                                          a   m    o    u    n    t
-                                    Pos  [8] [9] [10]  [11] [12] [13]
+### Comment Handler  
+Skips characters based on the type of comment:  
+- **Inline Comments:** Skips characters after `//` until a new line is encountered.  
+- **Block Comments:** Skips characters between `/*` and `*/` (handles multi-line comments).  
+
+### Error Handler  
+Detects and outputs syntax errors with position tracking for easy debugging.  
+
+---
+
+## **File Structure**  
+```plaintext
+src/
+│── lexer.c          # Main program logic for lexical analysis
+│── input_handler.c  # Handles input preprocessing and buffering
+│── tokenizer.c      # Tokenization logic
+│── error_handler.c  # Error detection and reporting
+tests/
+│── test_input.c     # Sample C programs for testing
+output/
+│── tokens.txt       # Generated token output
+docs/
+│── README.md        # Documentation
+│── demo.mp4         # Demo video
